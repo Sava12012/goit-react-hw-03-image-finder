@@ -1,7 +1,9 @@
-import { Component } from 'react';
+import React from 'react';
 import { toast } from 'react-toastify';
+import PropTypes from 'prop-types';
+import { Header, SearchForm, Input, ButtonSubmit } from './Searchbar.styled';
 
-export class Searchbar extends Component {
+export class Searchbar extends React.Component {
   state = {
     query: '',
     page: 1,
@@ -26,26 +28,29 @@ export class Searchbar extends Component {
   };
 
   render() {
-    // const { handleSubmit, handleSearchQueryChange } = this;
-    // const { query } = this.state;
+    const { handleSubmit, handleSearchQueryChange } = this;
+    const { query } = this.state;
 
     return (
-      <form onSubmit={this.handleSubmit} className="form">
-        <input
-          onChange={this.handleSearchQueryChange}
-          value={this.state.query}
-          className="input"
-          type="text"
-          autoComplete="off"
-          autoFocus
-          placeholder="Search images and photos"
-        />
-        <button type="submit" className="button">
-          Search
-        </button>
-      </form>
+      <Header className="searchbar">
+        <SearchForm onSubmit={handleSubmit} className="form">
+          <Input
+            onChange={handleSearchQueryChange}
+            value={query}
+            className="input"
+            type="text"
+            autoComplete="off"
+            autoFocus
+            placeholder="Search images and photos"
+          />
+
+          <ButtonSubmit type="submit" className="button">
+            Search
+          </ButtonSubmit>
+        </SearchForm>
+      </Header>
     );
   }
 }
 
-export default Searchbar;
+Searchbar.propTypes = { onSubmit: PropTypes.func.isRequired };

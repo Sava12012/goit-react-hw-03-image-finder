@@ -1,13 +1,20 @@
-import { Component } from 'react';
-import Searchbar from './Searchbar';
-import fetchImages from './API';
-// import { FallingLines } from 'react-loader-spinner';
+import React from 'react';
 import { ToastContainer } from 'react-toastify';
 import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-export class App extends Component {
+import { Button } from './Button/Button';
+import { Loader } from './Loader/Loader';
+import { fetchImages } from 'API/ImagesFinderApi';
+import { Searchbar } from './Searchbar/Searchbar';
+import { ImageGallery } from './ImageGallery/ImageGallery';
+
+export class App extends React.Component {
   state = {
     query: '',
+    images: [],
+    page: 1,
+    totalHits: 0,
     isLoading: false,
   };
 
@@ -16,10 +23,13 @@ export class App extends Component {
 
     if (prevState.query !== query || prevState.page !== page) {
       try {
+        this.setState({ isLoading: true });
+
         const { totalHits, hits } = await fetchImages(query, page);
 
         if (totalHits === 0) {
           toast.error('Nothing was found for your request');
+          this.setState({ isLoading: false });
           return;
         }
 
@@ -39,19 +49,27 @@ export class App extends Component {
     }
   }
 
+  handleLoadMore = () => {
+    this.setState(prevState => ({ page: prevState.page + 1 }));
+  };
+
   handleQuerySubmit = query => {
     this.setState({ query, page: 1 });
   };
 
   render() {
-    const { handleQuerySubmit } = this;
+    const { images, totalHits, isLoading } = this.state;
+    const { handleQuerySubmit, handleLoadMore } = this;
 
     return (
-      <div style={{ maxWidth: 1170, margin: '0 auto', padding: 20 }}>
+      <>
         <Searchbar onSubmit={handleQuerySubmit} />
+        {images && <ImageGallery images={images} />}
+        {!!totalHits && <Button onLoadMore={handleLoadMore} />}
+        {isLoading && <Loader />}
 
         <ToastContainer autoClose={2000} />
-      </div>
+      </>
     );
   }
 }
